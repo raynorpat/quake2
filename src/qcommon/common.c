@@ -797,9 +797,7 @@ char *MSG_ReadString (sizebuf_t *msg_read)
 	l = 0;
 	do
 	{
-	  // sku - replaced MSG_ReadChar with MSG_ReadByte to avoid
-	  // potentional vulnerability
-		c = MSG_ReadByte (msg_read);
+		c = MSG_ReadChar (msg_read);
 		if (c == -1 || c == 0)
 			break;
 		string[l] = c;
@@ -819,7 +817,7 @@ char *MSG_ReadStringLine (sizebuf_t *msg_read)
 	l = 0;
 	do
 	{
-		c = MSG_ReadByte (msg_read);
+		c = MSG_ReadChar (msg_read);
 		if (c == -1 || c == 0 || c == '\n')
 			break;
 		string[l] = c;

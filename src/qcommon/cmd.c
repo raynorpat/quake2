@@ -215,12 +215,7 @@ void Cbuf_Execute (void)
 			if (text[i] == '\n')
 				break;
 		}
-		
-		// sku - removed potentional buffer overflow vulnerability
-		if( i > sizeof( line ) - 1 ) {
-		  i = sizeof( line ) - 1;
-		}
-	
+			
 				
 		memcpy (line, text, i);
 		line[i] = 0;
@@ -662,9 +657,7 @@ void Cmd_TokenizeString (char *text, qboolean macroExpand)
 		{
 			int		l;
 
-			// sku - removed potentional buffer overflow 
-			//   vulnerability
-			strncpy( cmd_args, text, sizeof( cmd_args ) );
+			strcpy (cmd_args, text);
 
 			// strip off any trailing whitespace
 			l = strlen(cmd_args) - 1;

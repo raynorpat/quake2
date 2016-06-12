@@ -387,6 +387,8 @@ qboolean GLimp_Init( void *hinstance, void *wndproc )
 	return true;
 }
 
+qboolean have_stencil;
+
 qboolean GLimp_InitGL (void)
 {
     PIXELFORMATDESCRIPTOR pfd = 
@@ -403,8 +405,8 @@ qboolean GLimp_InitGL (void)
 		0,								// shift bit ignored
 		0,								// no accumulation buffer
 		0, 0, 0, 0, 					// accum bits ignored
-		32,								// 32-bit z-buffer	
-		0,								// no stencil buffer
+		24,								// 24-bit z-buffer	
+		8,								// 8-bit stencil buffer
 		0,								// no auxiliary buffer
 		PFD_MAIN_PLANE,					// main layer
 		0,								// reserved
@@ -531,6 +533,8 @@ qboolean GLimp_InitGL (void)
 	*/
 	ri.Con_Printf( PRINT_ALL, "GL PFD: color(%d-bits) Z(%d-bit)\n", ( int ) pfd.cColorBits, ( int ) pfd.cDepthBits );
 
+	have_stencil = true;
+
 	return true;
 
 fail:
@@ -596,6 +600,14 @@ void GLimp_EndFrame (void)
 		if ( !qwglSwapBuffers( glw_state.hDC ) )
 			ri.Sys_Error( ERR_FATAL, "GLimp_EndFrame() - SwapBuffers() failed!\n" );
 	}
+}
+
+/*
+** UpdateHardwareGamma
+*/
+void UpdateHardwareGamma( void )
+{
+	// todo
 }
 
 /*

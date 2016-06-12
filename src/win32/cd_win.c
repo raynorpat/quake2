@@ -189,93 +189,92 @@ void CDAudio_Play(int track, qboolean looping)
 
 void CDAudio_RandomPlay(void)
 {
-  int track, i = 0, free_tracks = 0, remap_track;
-  float f;
-  byte* track_bools;;
-  DWORD				dwReturn;
-  MCI_PLAY_PARMS		mciPlayParms;
-  MCI_STATUS_PARMS	mciStatusParms;
+	int track, i = 0, free_tracks = 0, remap_track;
+	float f;
+	byte* track_bools;;
+	DWORD				dwReturn;
+	MCI_PLAY_PARMS		mciPlayParms;
+	MCI_STATUS_PARMS	mciStatusParms;
   
-  if (!enabled)
-    return;
+	if (!enabled)
+		return;
   
-  //create array of available audio tracknumbers
+	// create array of available audio tracknumbers
+	track_bools = (byte*)malloc(maxTrack * sizeof(byte));
 
-  track_bools = (byte*)malloc(maxTrack * sizeof(byte));
-
-  if (track_bools == 0)
-    return;
+	if (track_bools == 0)
+		return;
   
-  for (; i < maxTrack; i++)
-    {
-      // don't try to play a non-audio track
-      mciStatusParms.dwItem = MCI_CDA_STATUS_TYPE_TRACK;
-      mciStatusParms.dwTrack = remap[i];
-      dwReturn = mciSendCommand(wDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK | MCI_WAIT, (DWORD) (LPVOID) &mciStatusParms);
-      if (dwReturn)
+	for (; i < maxTrack; i++)
 	{
-	  track_bools[i] = 0;
-	}
-      else
-        track_bools[i] = (mciStatusParms.dwReturn == MCI_CDA_TRACK_AUDIO);
+		// don't try to play a non-audio track
+		mciStatusParms.dwItem = MCI_CDA_STATUS_TYPE_TRACK;
+		mciStatusParms.dwTrack = remap[i];
+		dwReturn = mciSendCommand(wDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK | MCI_WAIT, (DWORD) (LPVOID) &mciStatusParms);
+		if (dwReturn)
+		{
+			track_bools[i] = 0;
+		}
+		else
+			track_bools[i] = (mciStatusParms.dwReturn == MCI_CDA_TRACK_AUDIO);
       
-      free_tracks += track_bools[i];
+		free_tracks += track_bools[i];
+	}
+  
+	if (!free_tracks)
+    {
+		Com_DPrintf("CDAudio_RandomPlay: Unable to find and play a random audio track, insert an audio cd please");
+		goto free_end;
     }
   
-  if (!free_tracks)
-    {
-      Com_DPrintf("CDAudio_RandomPlay: Unable to find and play a random audio track, insert an audio cd please");
-      goto free_end;
-    }
-  
-  //choose random audio track
-  do
-    {
-      do
+	//choose random audio track
+	do
 	{
-	  f = ((float)rand()) / ((float)RAND_MAX + 1.0);
-	  track = (int)(maxTrack  * f);
-	}
-      while(!track_bools[track]);
-      
-      remap_track = remap[track];
+		do
+		{
+			f = ((float)rand()) / ((float)RAND_MAX + 1.0);
+			track = (int)(maxTrack  * f);
+		} while (!track_bools[track]);
 
-      // get the length of the track to be played
-      mciStatusParms.dwItem = MCI_STATUS_LENGTH;
-      mciStatusParms.dwTrack = remap_track;
-      dwReturn = mciSendCommand(wDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK | MCI_WAIT, (DWORD) (LPVOID) &mciStatusParms);
-      if (dwReturn)
-	{
-	  Com_DPrintf("MCI_STATUS failed (%i)\n", dwReturn);
-	  goto free_end;
+		remap_track = remap[track];
+
+		// get the length of the track to be played
+		mciStatusParms.dwItem = MCI_STATUS_LENGTH;
+		mciStatusParms.dwTrack = remap_track;
+		dwReturn = mciSendCommand(wDeviceID, MCI_STATUS, MCI_STATUS_ITEM | MCI_TRACK | MCI_WAIT, (DWORD)(LPVOID)&mciStatusParms);
+		if (dwReturn)
+		{
+			Com_DPrintf("MCI_STATUS failed (%i)\n", dwReturn);
+			goto free_end;
+		}
+
+		if (playing)
+		{
+			if (playTrack == remap_track)
+			{
+				goto free_end;
+			}
+			CDAudio_Stop();
+		}
+
+		mciPlayParms.dwFrom = MCI_MAKE_TMSF(remap_track, 0, 0, 0);
+		mciPlayParms.dwTo = (mciStatusParms.dwReturn << 8) | remap_track;
+		mciPlayParms.dwCallback = (DWORD)cl_hwnd;
+		dwReturn = mciSendCommand(wDeviceID, MCI_PLAY, MCI_NOTIFY | MCI_FROM | MCI_TO, (DWORD)(LPVOID)&mciPlayParms);
+		if (dwReturn)
+		{
+			track_bools[track] = 0;
+			free_tracks--;
+		}
+		else
+		{
+			playLooping = true;
+			playTrack = remap_track;
+			playing = true;
+			break;
+		}
 	}
-      
-      if (playing)
-	{
-	  if (playTrack == remap_track)
-	    {
-	      goto free_end;
-	    }
-	  CDAudio_Stop();
-	}
-      
-      mciPlayParms.dwFrom = MCI_MAKE_TMSF(remap_track, 0, 0, 0);
-      mciPlayParms.dwTo = (mciStatusParms.dwReturn << 8) | remap_track;
-      mciPlayParms.dwCallback = (DWORD)cl_hwnd;
-      dwReturn = mciSendCommand(wDeviceID, MCI_PLAY, MCI_NOTIFY | MCI_FROM | MCI_TO, (DWORD)(LPVOID) &mciPlayParms);
-      if (dwReturn)
-	{
-	  track_bools[track] = 0;
-	  free_tracks--;
-	}
-      else
-	{
-	  playLooping = true;
-	  playTrack = remap_track;
-	  playing = true;
-	  break;
-	}
-  while (free_tracks > 0);
+	while (free_tracks > 0);
     
 free_end:
   free((void*)track_bools);
@@ -532,12 +531,12 @@ int CDAudio_Init(void)
 	int				n;
 
 	if (initialized)
-	  return;
+	  return 0;
 
 	cd_nocd = Cvar_Get ("cd_nocd", "0", CVAR_ARCHIVE );
 	cd_loopcount = Cvar_Get ("cd_loopcount", "4", 0);
 	cd_looptrack = Cvar_Get ("cd_looptrack", "11", 0);
-	if ( cd_nocd->value)
+	if ( cd_nocd->value )
 		return -1;
 
 	mciOpenParms.lpstrDeviceType = "cdaudio";

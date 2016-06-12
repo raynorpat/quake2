@@ -442,13 +442,15 @@ void Fake_glColorTableEXT( GLenum target, GLenum internalformat,
 
 #endif // linux
 
+#define GL_TEXTURE0_ARB						0x84C0
+#define GL_TEXTURE1_ARB						0x84C1
+
 /* deprecated */
 #define GL_TEXTURE0_SGIS					0x835E
 #define GL_TEXTURE1_SGIS					0x835F
 
 extern int QGL_TEXTURE0, QGL_TEXTURE1; /* ARB/SGIS texture defs */
 
-#ifdef SOLARIS /* these are in glext.h, on platforms that have it */
 /*
 ** extension constants
 */
@@ -456,7 +458,6 @@ extern int QGL_TEXTURE0, QGL_TEXTURE1; /* ARB/SGIS texture defs */
 #define GL_POINT_SIZE_MAX_EXT				0x8127
 #define GL_POINT_FADE_THRESHOLD_SIZE_EXT	0x8128
 #define GL_DISTANCE_ATTENUATION_EXT			0x8129
-#endif
 
 #ifdef __sgi
 #define GL_SHARED_TEXTURE_PALETTE_EXT		GL_TEXTURE_COLOR_TABLE_SGI

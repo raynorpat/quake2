@@ -342,9 +342,9 @@ void CL_DeltaEntity (frame_t *frame, int newnum, entity_state_t *old, int bits)
 		|| state->modelindex2 != ent->current.modelindex2
 		|| state->modelindex3 != ent->current.modelindex3
 		|| state->modelindex4 != ent->current.modelindex4
-		|| abs(state->origin[0] - ent->current.origin[0]) > 512
-		|| abs(state->origin[1] - ent->current.origin[1]) > 512
-		|| abs(state->origin[2] - ent->current.origin[2]) > 512
+		|| fabs(state->origin[0] - ent->current.origin[0]) > 512
+		|| fabs(state->origin[1] - ent->current.origin[1]) > 512
+		|| fabs(state->origin[2] - ent->current.origin[2]) > 512
 		|| state->event == EV_PLAYER_TELEPORT
 		|| state->event == EV_OTHER_TELEPORT
 		)
@@ -533,7 +533,7 @@ void CL_ParsePlayerstate (frame_t *oldframe, frame_t *newframe)
 	// parse the pmove_state_t
 	//
 	if (flags & PS_M_TYPE)
-		state->pmove.pm_type = MSG_ReadByte (&net_message);
+		state->pmove.pm_type = (pmtype_t) MSG_ReadByte (&net_message);
 
 	if (flags & PS_M_ORIGIN)
 	{

@@ -146,7 +146,7 @@ const char *Default_MenuKey( menuframework_s *m, int key )
 
 	if ( m )
 	{
-		if ( ( item = Menu_ItemAtCursor( m ) ) != 0 )
+		if ( ( item = (menucommon_s *)Menu_ItemAtCursor( m ) ) != 0 )
 		{
 			if ( item->type == MTYPE_FIELD )
 			{
@@ -2187,7 +2187,7 @@ SAVEGAME MENU
 
 =============================================================================
 */
-static menuframework_s	s_savegame_menu;
+
 static menuaction_s		s_savegame_actions[MAX_SAVEGAMES];
 
 void SaveGameCallback( void *self )
@@ -2607,7 +2607,7 @@ void StartServer_MenuInit( void )
 		length = ftell(fp);
 		fseek(fp, 0, SEEK_SET);
 #endif
-		buffer = malloc( length );
+		buffer = (char *) malloc( length );
 		fread( buffer, length, 1, fp );
 	}
 
@@ -2624,7 +2624,7 @@ void StartServer_MenuInit( void )
 	if ( nummaps == 0 )
 		Com_Error( ERR_DROP, "no maps in maps.lst\n" );
 
-	mapnames = malloc( sizeof( char * ) * ( nummaps + 1 ) );
+	mapnames = (char **) malloc( sizeof( char * ) * ( nummaps + 1 ) );
 	memset( mapnames, 0, sizeof( char * ) * ( nummaps + 1 ) );
 
 	s = buffer;
@@ -2643,7 +2643,7 @@ void StartServer_MenuInit( void )
 		strcpy( longname, COM_Parse( &s ) );
 		Com_sprintf( scratch, sizeof( scratch ), "%s\n%s", longname, shortname );
 
-		mapnames[i] = malloc( strlen( scratch ) + 1 );
+		mapnames[i] = (char *) malloc( strlen( scratch ) + 1 );
 		strcpy( mapnames[i], scratch );
 	}
 	mapnames[nummaps] = 0;
@@ -3595,7 +3595,7 @@ static qboolean PlayerConfig_ScanDirectories( void )
 		if ( !nskins )
 			continue;
 
-		skinnames = malloc( sizeof( char * ) * ( nskins + 1 ) );
+		skinnames = (char **) malloc( sizeof( char * ) * ( nskins + 1 ) );
 		memset( skinnames, 0, sizeof( char * ) * ( nskins + 1 ) );
 
 		// copy the valid skins

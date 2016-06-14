@@ -478,7 +478,7 @@ void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *heigh
 		return;
 	}
 
-	out = malloc ( (pcx->ymax+1) * (pcx->xmax+1) );
+	out = (byte *) malloc ( (pcx->ymax+1) * (pcx->xmax+1) );
 
 	*pic = out;
 
@@ -486,7 +486,7 @@ void LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *heigh
 
 	if (palette)
 	{
-		*palette = malloc(768);
+		*palette = (byte *) malloc(768);
 		memcpy (*palette, (byte *)pcx + len - 768, 768);
 	}
 
@@ -614,7 +614,7 @@ void LoadTGA (char *name, byte **pic, int *width, int *height)
 	if (height)
 		*height = rows;
 
-	targa_rgba = malloc (numPixels*4);
+	targa_rgba = (byte *) malloc (numPixels*4);
 	*pic = targa_rgba;
 
 	if (targa_header.id_length != 0)

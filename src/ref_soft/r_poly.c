@@ -894,8 +894,7 @@ void R_PolygonScanRightEdge (void)
 /*
 ** R_ClipAndDrawPoly
 */
-// PGM - isturbulent was qboolean. changed to int to allow passing more flags
-void R_ClipAndDrawPoly ( float alpha, int isturbulent, qboolean textured )
+void R_ClipAndDrawPoly ( float alpha, qboolean isturbulent, qboolean textured )
 {
 	emitpoint_t	outverts[MAXWORKINGVERTS+3], *pout;
 	float		*pv;

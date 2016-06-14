@@ -472,7 +472,7 @@ void R_SetupFrame (void)
 		vrect.width = r_newrefdef.width;
 		vrect.height = r_newrefdef.height;
 
-		d_viewbuffer = (void *)vid.buffer;
+		d_viewbuffer = (pixel_t *) vid.buffer;
 		r_screenwidth = vid.rowbytes;
 	}
 	

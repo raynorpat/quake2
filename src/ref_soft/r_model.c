@@ -303,8 +303,8 @@ void Mod_LoadLighting (lump_t *l)
 		return;
 	}
 	size = l->filelen/3;
-	loadmodel->lightdata = Hunk_Alloc (size);
-	in = (void *)(mod_base + l->fileofs);
+	loadmodel->lightdata = (byte *) Hunk_Alloc (size);
+	in = (byte *)(mod_base + l->fileofs);
 	for (i=0 ; i<size ; i++, in+=3)
 	{
 		if (in[0] > in[1] && in[0] > in[2])
@@ -357,7 +357,7 @@ void Mod_LoadVisibility (lump_t *l)
 		loadmodel->vis = NULL;
 		return;
 	}
-	loadmodel->vis = Hunk_Alloc ( l->filelen);	
+	loadmodel->vis = (dvis_t *) Hunk_Alloc ( l->filelen);
 	memcpy (loadmodel->vis, mod_base + l->fileofs, l->filelen);
 
 	loadmodel->vis->numclusters = LittleLong (loadmodel->vis->numclusters);
@@ -380,19 +380,11 @@ void Mod_LoadVertexes (lump_t *l)
 	mvertex_t	*out;
 	int			i, count;
 
-	in = (void *)(mod_base + l->fileofs);
+	in = (dvertex_t *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( (count+8)*sizeof(*out));		// extra for skybox
-        /*
-         * PATCH: eliasm
-         *
-         * This patch fixes the problem where the games dumped core
-         * when changing levels.
-         */
-        memset( out, 0, (count + 6) * sizeof( *out ) );
-        /* END OF PATCH */
+	out = (mvertex_t *) Hunk_Alloc ( (count+8)*sizeof(*out));		// extra for skybox
 
 	loadmodel->vertexes = out;
 	loadmodel->numvertexes = count;
@@ -416,11 +408,11 @@ void Mod_LoadSubmodels (lump_t *l)
 	dmodel_t	*out;
 	int			i, j, count;
 
-	in = (void *)(mod_base + l->fileofs);
+	in = (dmodel_t *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = (dmodel_t *) Hunk_Alloc ( count*sizeof(*out));
 
 	loadmodel->submodels = out;
 	loadmodel->numsubmodels = count;
@@ -450,11 +442,11 @@ void Mod_LoadEdges (lump_t *l)
 	medge_t *out;
 	int 	i, count;
 
-	in = (void *)(mod_base + l->fileofs);
+	in = (dedge_t *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( (count + 13) * sizeof(*out));	// extra for skybox
+	out = (medge_t *) Hunk_Alloc ( (count + 13) * sizeof(*out));	// extra for skybox
 
 	loadmodel->edges = out;
 	loadmodel->numedges = count;
@@ -480,11 +472,11 @@ void Mod_LoadTexinfo (lump_t *l)
 	char	name[MAX_QPATH];
 	int		next;
 
-	in = (void *)(mod_base + l->fileofs);
+	in = (texinfo_t *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( (count+6)*sizeof(*out));	// extra for skybox
+	out = (mtexinfo_t *) Hunk_Alloc ( (count+6)*sizeof(*out));	// extra for skybox
 
 	loadmodel->texinfo = out;
 	loadmodel->numtexinfo = count;
@@ -614,11 +606,11 @@ void Mod_LoadFaces (lump_t *l)
 	int			i, count, surfnum;
 	int			planenum, side;
 
-	in = (void *)(mod_base + l->fileofs);
+	in = (dface_t *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( (count+6)*sizeof(*out));	// extra for skybox
+	out = (msurface_t *) Hunk_Alloc ( (count+6)*sizeof(*out));	// extra for skybox
 
 	loadmodel->surfaces = out;
 	loadmodel->numsurfaces = count;
@@ -717,11 +709,11 @@ void Mod_LoadNodes (lump_t *l)
 	dnode_t		*in;
 	mnode_t 	*out;
 
-	in = (void *)(mod_base + l->fileofs);
+	in = (dnode_t *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = (mnode_t *) Hunk_Alloc ( count*sizeof(*out));
 
 	loadmodel->nodes = out;
 	loadmodel->numnodes = count;
@@ -765,11 +757,11 @@ void Mod_LoadLeafs (lump_t *l)
 	mleaf_t 	*out;
 	int			i, j, count;
 
-	in = (void *)(mod_base + l->fileofs);
+	in = (dleaf_t *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));
+	out = (mleaf_t *) Hunk_Alloc ( count*sizeof(*out));
 
 	loadmodel->leafs = out;
 	loadmodel->numleafs = count;
@@ -804,11 +796,11 @@ void Mod_LoadMarksurfaces (lump_t *l)
 	short		*in;
 	msurface_t **out;
 	
-	in = (void *)(mod_base + l->fileofs);
+	in = (short *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));	
+	out = (msurface_t **) Hunk_Alloc ( count*sizeof(*out));
 
 	loadmodel->marksurfaces = out;
 	loadmodel->nummarksurfaces = count;
@@ -832,11 +824,11 @@ void Mod_LoadSurfedges (lump_t *l)
 	int		i, count;
 	int		*in, *out;
 	
-	in = (void *)(mod_base + l->fileofs);
+	in = (int *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( (count+24)*sizeof(*out));	// extra for skybox
+	out = (int *) Hunk_Alloc ( (count+24)*sizeof(*out));	// extra for skybox
 
 	loadmodel->surfedges = out;
 	loadmodel->numsurfedges = count;
@@ -858,11 +850,11 @@ void Mod_LoadPlanes (lump_t *l)
 	int			count;
 	int			bits;
 	
-	in = (void *)(mod_base + l->fileofs);
+	in = (dplane_t *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( (count+6)*sizeof(*out));		// extra for skybox
+	out = (mplane_t *) Hunk_Alloc ( (count+6)*sizeof(*out));		// extra for skybox
 	
 	loadmodel->planes = out;
 	loadmodel->numplanes = count;
@@ -986,7 +978,7 @@ void Mod_LoadAliasModel (model_t *mod, void *buffer)
 		ri.Sys_Error (ERR_DROP, "%s has wrong version number (%i should be %i)",
 				 mod->name, version, ALIAS_VERSION);
 
-	pheader = Hunk_Alloc (LittleLong(pinmodel->ofs_end));
+	pheader = (dmdl_t *) Hunk_Alloc (LittleLong(pinmodel->ofs_end));
 	
 	// byte swap the header fields and sanity check
 	for (i=0 ; i<sizeof(dmdl_t)/4 ; i++)
@@ -1099,7 +1091,7 @@ void Mod_LoadSpriteModel (model_t *mod, void *buffer)
 	int			i;
 
 	sprin = (dsprite_t *)buffer;
-	sprout = Hunk_Alloc (modfilelen);
+	sprout = (dsprite_t *) Hunk_Alloc (modfilelen);
 
 	sprout->ident = LittleLong (sprin->ident);
 	sprout->version = LittleLong (sprin->version);
@@ -1221,7 +1213,7 @@ void R_EndRegistration (void)
 		}
 		else
 		{	// make sure it is paged in
-			Com_PageInMemory (mod->extradata, mod->extradatasize);
+			Com_PageInMemory ((byte *)mod->extradata, mod->extradatasize);
 		}
 	}
 

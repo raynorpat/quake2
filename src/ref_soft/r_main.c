@@ -333,7 +333,7 @@ int R_Init( void *hInstance, void *wndProc )
 	// create the window
 	R_BeginFrame( 0 );
 
-	ri.Con_Printf (PRINT_ALL, "ref_soft version: "REF_VERSION"\n");
+	ri.Con_Printf (PRINT_ALL, "ref_soft version: " REF_VERSION"\n");
 
 	return true;
 }
@@ -388,7 +388,7 @@ void R_NewMap (void)
 
 	if (r_cnumsurfs > NUMSTACKSURFACES)
 	{
-		surfaces = malloc (r_cnumsurfs * sizeof(surf_t));
+		surfaces = (surf_t *) malloc (r_cnumsurfs * sizeof(surf_t));
 		surface_p = surfaces;
 		surf_max = &surfaces[r_cnumsurfs];
 		r_surfsonstack = false;
@@ -416,7 +416,7 @@ void R_NewMap (void)
 	}
 	else
 	{
-		auxedges = malloc (r_numallocatededges * sizeof(edge_t));
+		auxedges = (edge_t *) malloc (r_numallocatededges * sizeof(edge_t));
 	}
 }
 
@@ -1083,7 +1083,7 @@ void R_InitGraphics( int width, int height )
 		sc_base = NULL;
 	}
 
-	d_pzbuffer = malloc(vid.width*vid.height*2);
+	d_pzbuffer = (short *) malloc(vid.width*vid.height*2);
 
 	R_InitCaches ();
 

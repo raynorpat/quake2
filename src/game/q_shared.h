@@ -51,13 +51,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 typedef unsigned char 		byte;
-typedef enum {false, true}	qboolean;
-
+typedef bool qboolean;
+//typedef enum {false, true}	qboolean;
 
 #ifndef NULL
 #define NULL ((void *)0)
 #endif
-
 
 // angle indexes
 #define	PITCH				0		// up / down
@@ -83,33 +82,29 @@ typedef enum {false, true}	qboolean;
 #define	MAX_ITEMS			256
 #define MAX_GENERAL			(MAX_CLIENTS*2)	// general config strings
 
-
 // game print flags
 #define	PRINT_LOW			0		// pickup messages
 #define	PRINT_MEDIUM		1		// death messages
 #define	PRINT_HIGH			2		// critical messages
 #define	PRINT_CHAT			3		// chat messages
 
-
+#define	PRINT_ALL			0
+#define PRINT_DEVELOPER		1		// only print when "developer 1"
+#define PRINT_ALERT			2		
 
 #define	ERR_FATAL			0		// exit the entire game with a popup window
 #define	ERR_DROP			1		// print to console and disconnect from game
 #define	ERR_DISCONNECT		2		// don't kill server
 
-#define	PRINT_ALL			0
-#define PRINT_DEVELOPER		1		// only print when "developer 1"
-#define PRINT_ALERT			2		
-
-
 // destination class for gi.multicast()
 typedef enum
 {
-MULTICAST_ALL,
-MULTICAST_PHS,
-MULTICAST_PVS,
-MULTICAST_ALL_R,
-MULTICAST_PHS_R,
-MULTICAST_PVS_R
+	MULTICAST_ALL,
+	MULTICAST_PHS,
+	MULTICAST_PVS,
+	MULTICAST_ALL_R,
+	MULTICAST_PHS_R,
+	MULTICAST_PVS_R
 } multicast_t;
 
 

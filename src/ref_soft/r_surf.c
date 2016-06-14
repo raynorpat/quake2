@@ -176,7 +176,7 @@ void R_DrawSurfaceBlock8_mip0 (void)
 	unsigned char	pix, *psource, *prowdest;
 
 	psource = pbasesource;
-	prowdest = prowdestbase;
+	prowdest = (byte *)prowdestbase;
 
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
@@ -226,7 +226,7 @@ void R_DrawSurfaceBlock8_mip1 (void)
 	unsigned char	pix, *psource, *prowdest;
 
 	psource = pbasesource;
-	prowdest = prowdestbase;
+	prowdest = (byte *)prowdestbase;
 
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
@@ -276,7 +276,7 @@ void R_DrawSurfaceBlock8_mip2 (void)
 	unsigned char	pix, *psource, *prowdest;
 
 	psource = pbasesource;
-	prowdest = prowdestbase;
+	prowdest = (byte *)prowdestbase;
 
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
@@ -326,7 +326,7 @@ void R_DrawSurfaceBlock8_mip3 (void)
 	unsigned char	pix, *psource, *prowdest;
 
 	psource = pbasesource;
-	prowdest = prowdestbase;
+	prowdest = (byte *)prowdestbase;
 
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
@@ -441,7 +441,7 @@ D_SCAlloc
 */
 surfcache_t     *D_SCAlloc (int width, int size)
 {
-	surfcache_t             *new;
+	surfcache_t             *newsurf;
 	qboolean                wrapped_this_time;
 
 	if ((width < 0) || (width > 256))
@@ -468,11 +468,11 @@ surfcache_t     *D_SCAlloc (int width, int size)
 	}
 		
 // colect and free surfcache_t blocks until the rover block is large enough
-	new = sc_rover;
+	newsurf = sc_rover;
 	if (sc_rover->owner)
 		*sc_rover->owner = NULL;
 	
-	while (new->size < size)
+	while (newsurf->size < size)
 	{
 	// free another
 		sc_rover = sc_rover->next;
@@ -481,30 +481,30 @@ surfcache_t     *D_SCAlloc (int width, int size)
 		if (sc_rover->owner)
 			*sc_rover->owner = NULL;
 			
-		new->size += sc_rover->size;
-		new->next = sc_rover->next;
+		newsurf->size += sc_rover->size;
+		newsurf->next = sc_rover->next;
 	}
 
 // create a fragment out of any leftovers
-	if (new->size - size > 256)
+	if (newsurf->size - size > 256)
 	{
-		sc_rover = (surfcache_t *)( (byte *)new + size);
-		sc_rover->size = new->size - size;
-		sc_rover->next = new->next;
+		sc_rover = (surfcache_t *)( (byte *)newsurf + size);
+		sc_rover->size = newsurf->size - size;
+		sc_rover->next = newsurf->next;
 		sc_rover->width = 0;
 		sc_rover->owner = NULL;
-		new->next = sc_rover;
-		new->size = size;
+		newsurf->next = sc_rover;
+		newsurf->size = size;
 	}
 	else
-		sc_rover = new->next;
+		sc_rover = newsurf->next;
 	
-	new->width = width;
+	newsurf->width = width;
 // DEBUG
 	if (width > 0)
-		new->height = (size - sizeof(*new) + sizeof(new->data)) / width;
+		newsurf->height = (size - sizeof(*newsurf) + sizeof(newsurf->data)) / width;
 
-	new->owner = NULL;              // should be set properly after return
+	newsurf->owner = NULL;              // should be set properly after return
 
 	if (d_roverwrapped)
 	{
@@ -516,7 +516,7 @@ surfcache_t     *D_SCAlloc (int width, int size)
 		d_roverwrapped = true;
 	}
 
-	return new;
+	return newsurf;
 }
 
 

@@ -152,7 +152,7 @@ qboolean DIB_Init( unsigned char **ppbuffer, int *ppitch )
 	sww_state.hDIBSection = CreateDIBSection( sww_state.hDC,
 		                                     pbmiDIB,
 											 DIB_RGB_COLORS,
-											 &sww_state.pDIBBase,
+											 (void **)&sww_state.pDIBBase,
 											 NULL,
 											 0 );
 
@@ -363,7 +363,7 @@ void DIB_Shutdown( void )
 static void DIB_RestoreSystemColors( void )
 {
     SetSystemPaletteUse( sww_state.hDC, SYSPAL_STATIC );
-    SetSysColors( NUM_SYS_COLORS, s_syspalindices, s_oldsyscolors );
+    SetSysColors( NUM_SYS_COLORS, s_syspalindices, (const COLORREF *)s_oldsyscolors );
 }
 
 static void DIB_SaveSystemColors( void )

@@ -211,7 +211,6 @@ extern cvar_t	*gl_particle_att_c;
 extern	cvar_t	*gl_nosubimage;
 extern	cvar_t	*gl_bitdepth;
 extern	cvar_t	*gl_mode;
-extern	cvar_t	*gl_log;
 extern	cvar_t	*gl_lightmap;
 extern	cvar_t	*gl_shadows;
 extern	cvar_t	*gl_stencilshadow;
@@ -462,11 +461,9 @@ IMPLEMENTATION SPECIFIC FUNCTIONS
 
 void		GLimp_BeginFrame( float camera_separation );
 void		GLimp_EndFrame( void );
-int 		GLimp_Init( void *hinstance, void *hWnd );
+qboolean	GLimp_Init( void *hinstance, void *hWnd );
 void		GLimp_Shutdown( void );
-int     	GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen );
+rserr_t		GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen );
 void		GLimp_AppActivate( qboolean active );
-void		GLimp_EnableLogging( qboolean enable );
-void		GLimp_LogNewFrame( void );
 
 #endif

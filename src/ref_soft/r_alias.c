@@ -175,7 +175,7 @@ unsigned long R_AliasCheckFrameBBox( daliasframe_t *frame, float worldxf[3][4] )
 	return BBOX_MUST_CLIP_XY;
 }
 
-qboolean R_AliasCheckBBox (void)
+unsigned long R_AliasCheckBBox (void)
 {
 	unsigned long ccodes[2] = { 0, 0 };
 
@@ -1035,14 +1035,16 @@ void R_AliasSetUpLerpData( dmdl_t *pmdl, float backlerp )
 R_AliasDrawModel
 ================
 */
+struct spanpackage_t;
+
 void R_AliasDrawModel (void)
 {
-	extern void	(*d_pdrawspans)(void *);
-	extern void R_PolysetDrawSpans8_Opaque( void * );
-	extern void R_PolysetDrawSpans8_33( void * );
-	extern void R_PolysetDrawSpans8_66( void * );
-	extern void R_PolysetDrawSpansConstant8_33( void * );
-	extern void R_PolysetDrawSpansConstant8_66( void * );
+	extern void	(*d_pdrawspans)( spanpackage_t *pspanpackage );
+	extern void R_PolysetDrawSpans8_Opaque( spanpackage_t *pspanpackage );
+	extern void R_PolysetDrawSpans8_33( spanpackage_t *pspanpackage );
+	extern void R_PolysetDrawSpans8_66( spanpackage_t *pspanpackage );
+	extern void R_PolysetDrawSpansConstant8_33( spanpackage_t *pspanpackage );
+	extern void R_PolysetDrawSpansConstant8_66( spanpackage_t *pspanpackage );
 
 	s_pmdl = (dmdl_t *)currentmodel->extradata;
 

@@ -26,6 +26,23 @@ viddef_t	vid;
 
 refimport_t	ri;
 
+void (APIENTRY * qglPointParameterfEXT)(GLenum param, GLfloat value);
+void (APIENTRY * qglPointParameterfvEXT)(GLenum param, const GLfloat *value);
+void (APIENTRY * qglColorTableEXT)(GLenum, GLenum, GLsizei, GLenum, GLenum, const GLvoid *);
+
+void (APIENTRY * qglLockArraysEXT) (int, int);
+void (APIENTRY * qglUnlockArraysEXT) (void);
+
+void (APIENTRY * qglMTexCoord2fSGIS)(GLenum, GLfloat, GLfloat);
+void (APIENTRY * qglSelectTextureSGIS)(GLenum);
+
+void (APIENTRY * qglActiveTextureARB)(GLenum);
+void (APIENTRY * qglClientActiveTextureARB)(GLenum);
+
+#ifdef _WIN32
+BOOL (WINAPI * qwglSwapIntervalEXT)(int interval);
+#endif
+
 int QGL_TEXTURE0, QGL_TEXTURE1;
 
 model_t		*r_worldmodel;
@@ -100,7 +117,6 @@ cvar_t	*gl_ext_multitexture;
 cvar_t	*gl_ext_pointparameters;
 cvar_t	*gl_ext_compiled_vertex_array;
 
-cvar_t	*gl_log;
 cvar_t	*gl_bitdepth;
 cvar_t	*gl_drawbuffer;
 cvar_t  *gl_driver;
@@ -1002,7 +1018,6 @@ void R_Register( void )
 	gl_particle_att_c = ri.Cvar_Get( "gl_particle_att_c", "0.01", CVAR_ARCHIVE );
 
 	gl_modulate = ri.Cvar_Get ("gl_modulate", "1", CVAR_ARCHIVE );
-	gl_log = ri.Cvar_Get( "gl_log", "0", 0 );
 	gl_bitdepth = ri.Cvar_Get( "gl_bitdepth", "0", 0 );
 	gl_mode = ri.Cvar_Get( "gl_mode", "3", CVAR_ARCHIVE );
 	gl_lightmap = ri.Cvar_Get ("gl_lightmap", "0", 0);
@@ -1129,24 +1144,16 @@ int R_Init( void *hinstance, void *hWnd )
 		r_turbsin[j] *= 0.5;
 	}
 
-	ri.Con_Printf (PRINT_ALL, "ref_gl version: "REF_VERSION"\n");
+	ri.Con_Printf (PRINT_ALL, "ref_gl version: " REF_VERSION "\n");
 
 	Draw_GetPalette ();
 
 	R_Register();
-
-	// initialize our QGL dynamic bindings
-	if ( !QGL_Init( gl_driver->string ) )
-	{
-		QGL_Shutdown();
-		ri.Con_Printf (PRINT_ALL, "ref_gl::R_Init() - could not load \"%s\"\n", gl_driver->string );
-		return -1;
-	}
-
+	
 	// initialize OS-specific parts of OpenGL
 	if ( !GLimp_Init( hinstance, hWnd ) )
 	{
-		QGL_Shutdown();
+		ri.Con_Printf(PRINT_ALL, "ref_gl::R_Init() - could not GLimp_Init()\n");
 		return -1;
 	}
 
@@ -1156,7 +1163,6 @@ int R_Init( void *hinstance, void *hWnd )
 	// create the window and set up the context
 	if ( !R_SetMode () )
 	{
-		QGL_Shutdown();
 		ri.Con_Printf (PRINT_ALL, "ref_gl::R_Init() - could not R_SetMode()\n" );
 		return -1;
 	}
@@ -1270,8 +1276,8 @@ int R_Init( void *hinstance, void *hWnd )
 		 strstr( gl_config.extensions_string, "GL_SGI_compiled_vertex_array" ) )
 	{
 		ri.Con_Printf( PRINT_ALL, "...enabling GL_EXT_compiled_vertex_array\n" );
-		qglLockArraysEXT = ( void * ) qwglGetProcAddress( "glLockArraysEXT" );
-		qglUnlockArraysEXT = ( void * ) qwglGetProcAddress( "glUnlockArraysEXT" );
+		qglLockArraysEXT = ( void(__stdcall *)(int, int) ) qwglGetProcAddress( "glLockArraysEXT" );
+		qglUnlockArraysEXT = ( void(__stdcall *)(void) ) qwglGetProcAddress( "glUnlockArraysEXT" );
 	}
 	else
 	{
@@ -1352,9 +1358,9 @@ int R_Init( void *hinstance, void *hWnd )
 		if ( gl_ext_multitexture->value )
 		{
 			ri.Con_Printf( PRINT_ALL, "...using GL_ARB_multitexture\n" );
-			qglMTexCoord2fSGIS = ( void * ) qwglGetProcAddress( "glMultiTexCoord2fARB" );
-			qglActiveTextureARB = ( void * ) qwglGetProcAddress( "glActiveTextureARB" );
-			qglClientActiveTextureARB = ( void * ) qwglGetProcAddress( "glClientActiveTextureARB" );
+			qglMTexCoord2fSGIS = ( void(__stdcall *)(GLenum, GLfloat, GLfloat) ) qwglGetProcAddress( "glMultiTexCoord2fARB" );
+			qglActiveTextureARB = ( void(__stdcall *)(GLenum) ) qwglGetProcAddress( "glActiveTextureARB" );
+			qglClientActiveTextureARB = ( void(__stdcall *)(GLenum) ) qwglGetProcAddress( "glClientActiveTextureARB" );
 			QGL_TEXTURE0 = GL_TEXTURE0_ARB;
 			QGL_TEXTURE1 = GL_TEXTURE1_ARB;
 		}
@@ -1377,8 +1383,8 @@ int R_Init( void *hinstance, void *hWnd )
 		else if ( gl_ext_multitexture->value )
 		{
 			ri.Con_Printf( PRINT_ALL, "...using GL_SGIS_multitexture\n" );
-			qglMTexCoord2fSGIS = ( void * ) qwglGetProcAddress( "glMTexCoord2fSGIS" );
-			qglSelectTextureSGIS = ( void * ) qwglGetProcAddress( "glSelectTextureSGIS" );
+			qglMTexCoord2fSGIS = ( void(__stdcall *)(GLenum, GLfloat, GLfloat) ) qwglGetProcAddress( "glMTexCoord2fSGIS" );
+			qglSelectTextureSGIS = ( void(__stdcall *)(GLenum) ) qwglGetProcAddress( "glSelectTextureSGIS" );
 			QGL_TEXTURE0 = GL_TEXTURE0_SGIS;
 			QGL_TEXTURE1 = GL_TEXTURE1_SGIS;
 		}
@@ -1433,11 +1439,6 @@ void R_Shutdown (void)
 	** shut down OS specific OpenGL stuff like contexts, etc.
 	*/
 	GLimp_Shutdown();
-
-	/*
-	** shutdown our QGL subsystem
-	*/
-	QGL_Shutdown();
 }
 
 
@@ -1463,17 +1464,6 @@ void R_BeginFrame( float camera_separation )
 
 		ref = ri.Cvar_Get ("vid_ref", "gl", 0);
 		ref->modified = true;
-	}
-
-	if ( gl_log->modified )
-	{
-		GLimp_EnableLogging( gl_log->value );
-		gl_log->modified = false;
-	}
-
-	if ( gl_log->value )
-	{
-		GLimp_LogNewFrame();
 	}
 
 	/*

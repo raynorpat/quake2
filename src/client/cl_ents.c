@@ -647,19 +647,6 @@ void CL_FireEntityEvents (frame_t *frame)
 		s1 = &cl_parse_entities[num];
 		if (s1->event)
 			CL_EntityEvent (s1);
-#ifdef QMAX
-		//add stains if moving...
-		if (s1->origin[0]!=s1->old_origin[0]||
-			s1->origin[1]!=s1->old_origin[1]||
-			s1->origin[2]!=s1->old_origin[2])
-		{
-			if (s1->effects & EF_GIB)
-				re.AddStain(s1->origin, 25, 0, -200 ,-200);
-			if (s1->effects & EF_GREENGIB)
-				re.AddStain(s1->origin, 25, -200, 0, -200);
-
-		}
-#endif
 
 		// EF_TELEPORTER acts like an event, but is not cleared each frame
 		if (s1->effects & EF_TELEPORTER)

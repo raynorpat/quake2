@@ -75,27 +75,14 @@ cl_sustain_t	cl_sustains[MAX_SUSTAINS];
 extern void CL_TeleportParticles (vec3_t org);
 //PGM
 
-#ifdef QMAX
-void CL_BloodHit (vec3_t org, vec3_t dir);
-void CL_BlasterParticles (vec3_t org, vec3_t dir, int count);
-void CL_ParticleEffectSparks (vec3_t org, vec3_t dir, vec3_t color, int count);
-#else
 void CL_BlasterParticles (vec3_t org, vec3_t dir);
-#endif
 void CL_BFGExplosionParticles (vec3_t org);
 // RAFAEL
 void CL_BlueBlasterParticles (vec3_t org, vec3_t dir);
 
-#ifdef QMAX
-void CL_Explosion_Particle (vec3_t org, float scale, qboolean large, qboolean rocket);
-//void CL_ExplosionParticles (vec3_t org, float alpha);
-void CL_ExplosionParticles (vec3_t org);
-#define EXPLOSION_PARTICLES(x) CL_ExplosionParticles((x));
-#else
 void CL_ExplosionParticles (vec3_t org);
 void CL_Explosion_Particle (vec3_t org, float size, qboolean large, qboolean rocket);
 #define EXPLOSION_PARTICLES(x) CL_ExplosionParticles((x));
-#endif
 
 struct sfx_s	*cl_sfx_ric1;
 struct sfx_s	*cl_sfx_ric2;
@@ -237,19 +224,6 @@ void CL_ClearTEnts (void)
 	memset (cl_sustains, 0, sizeof(cl_sustains));
 //ROGUE
 }
-
-#ifdef QMAX
-#define EXP_DIST 10
-void CL_R_Explode_SP (vec3_t origin)
-{
-  CL_Explosion_Particle (origin, 0, true, true);
-}
-
-void CL_G_Explode_SP (vec3_t origin)
-{
-  CL_Explosion_Particle (origin, 0, true, false);
-}
-#endif
 
 /*
 =================
@@ -581,23 +555,6 @@ void CL_ParseLaser (int colors)
 	}
 }
 
-#ifdef QMAX
-void CL_GunSmokeEffect (vec3_t org, vec3_t dir)
-{
-	vec3_t		velocity, origin;
-	int			j;
-
-	for (j=0 ; j<3 ; j++)
-	{
-		origin[j] = org[j] + dir[j]*10;
-		velocity[j] = 10*dir[j];
-	}
-	velocity[2] = 10;
-
-	CL_ParticleSmokeEffect (origin, velocity, 0, 10, 10);
-
-}
-#endif
 //=============
 //ROGUE
 void CL_ParseSteam (void)
@@ -755,11 +712,7 @@ void CL_ParseTEnt (void)
 	case TE_BLOOD:			// bullet hitting flesh
 		MSG_ReadPos (&net_message, pos);
 		MSG_ReadDir (&net_message, dir);
-#ifdef QMAX
-		CL_BloodHit (pos, dir);
-#else
 		CL_ParticleEffect (pos, dir, 0xe8, 60);
-#endif
 		break;
 
 	case TE_GUNSHOT:			// bullet hitting wall
@@ -767,28 +720,15 @@ void CL_ParseTEnt (void)
 	case TE_BULLET_SPARKS:
 		MSG_ReadPos (&net_message, pos);
 		MSG_ReadDir (&net_message, dir);
-#ifdef QMAX
-		if (type != TE_SPARKS)
-		{
-			CL_GunSmokeEffect (pos, dir);
-			re.AddStain(pos, 5, -175, -175, -175);
-		}
-
-		if (type == TE_BULLET_SPARKS)
-		{
-		  VectorScale(dir, 1.1, dir);
-		}
-#else
 		if (type == TE_GUNSHOT)
 			CL_ParticleEffect (pos, dir, 0, 40);
 		else
 			CL_ParticleEffect (pos, dir, 0xe0, 6);
-#endif
+
 		if (type != TE_SPARKS)
 		{
-#ifndef QMAX
 			CL_SmokeAndFlash(pos);
-#endif			
+
 			// impact sound
 			cnt = rand()&15;
 			if (cnt == 1)
@@ -798,13 +738,6 @@ void CL_ParseTEnt (void)
 			else if (cnt == 3)
 				S_StartSound (pos, 0, 0, cl_sfx_ric3, 1, ATTN_NORM, 0);
 		}
-#ifdef QMAX
-		//adding sparks
-		{
-		  vec3_t color = { 255, 125, 10 };
-		  CL_ParticleEffectSparks (pos, dir, color, (type == TE_GUNSHOT)? 5 : 10);
-		}
-#endif
 		break;
 		
 	case TE_SCREEN_SPARKS:
@@ -822,17 +755,9 @@ void CL_ParseTEnt (void)
 	case TE_SHOTGUN:			// bullet hitting wall
 		MSG_ReadPos (&net_message, pos);
 		MSG_ReadDir (&net_message, dir);
-#ifdef QMAX
-		CL_GunSmokeEffect (pos, dir);
-		{
-			vec3_t color = { 200, 100, 10 };
-			CL_ParticleEffectSparks (pos, dir, color, 8);
-		}
-		re.AddStain(pos, 7, -175, -175, -175);
-#else
+
 		CL_ParticleEffect (pos, dir, 0, 20);
 		CL_SmokeAndFlash(pos);
-#endif		
 		break;
 
 	case TE_SPLASH:			// bullet hitting water
@@ -870,19 +795,13 @@ void CL_ParseTEnt (void)
 	case TE_BLUEHYPERBLASTER:
 		MSG_ReadPos (&net_message, pos);
 		MSG_ReadPos (&net_message, dir);
-#ifdef QMAX
-		CL_BlasterParticles (pos, dir, 40);
-#else
 		CL_BlasterParticles (pos, dir);
-#endif
 		break;
 
 	case TE_BLASTER:			// blaster hitting wall
 		MSG_ReadPos (&net_message, pos);
 		MSG_ReadDir (&net_message, dir);
-#ifdef QMAX
-		CL_BlasterParticles (pos, dir, 40);
-#else		
+	
 		CL_BlasterParticles (pos, dir);
 
 		ex = CL_AllocExplosion ();
@@ -906,7 +825,7 @@ void CL_ParseTEnt (void)
 		ex->lightcolor[1] = 1;
 		ex->ent.model = cl_mod_explode;
 		ex->frames = 4;
-#endif
+
 		S_StartSound (pos,  0, 0, cl_sfx_lashit, 1, ATTN_NORM, 0);
 		break;
 		
@@ -921,14 +840,7 @@ void CL_ParseTEnt (void)
 	case TE_GRENADE_EXPLOSION:
 	case TE_GRENADE_EXPLOSION_WATER:
 		MSG_ReadPos (&net_message, pos);
-#ifdef QMAX
-		CL_G_Explode_SP(pos);
 
-		//		if (type!=TE_GRENADE_EXPLOSION_WATER)
-		//	CL_Radius_Explode_SP(pos, 1.25);
-		//		CL_ExplosionParticles (pos,1.25);
-		CL_ExplosionParticles (pos);
-#else
 		ex = CL_AllocExplosion ();
 		VectorCopy (pos, ex->ent.origin);
 		ex->type = ex_poly;
@@ -943,7 +855,7 @@ void CL_ParseTEnt (void)
 		ex->baseframe = 30;
 		ex->ent.angles[1] = rand() % 360;
 		EXPLOSION_PARTICLES (pos);
-#endif
+
 		if (type == TE_GRENADE_EXPLOSION_WATER)
 			S_StartSound (pos, 0, 0, cl_sfx_watrexp, 1, ATTN_NORM, 0);
 		else
@@ -953,12 +865,7 @@ void CL_ParseTEnt (void)
 	// RAFAEL
 	case TE_PLASMA_EXPLOSION:
 		MSG_ReadPos (&net_message, pos);
-#ifdef QMAX
-		CL_R_Explode_SP(pos);
-//		CL_ExplosionParticles (pos, 1);
-//		CL_ExplosionParticles (pos);
 
-#else
 		ex = CL_AllocExplosion ();
 		VectorCopy (pos, ex->ent.origin);
 		ex->type = ex_poly;
@@ -974,51 +881,17 @@ void CL_ParseTEnt (void)
 			ex->baseframe = 15;
 		ex->frames = 15;
 		EXPLOSION_PARTICLES (pos);
-#endif
+
 		S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
 		break;
 	
 	case TE_EXPLOSION1_BIG:
-#ifdef QMAX	
-	  // PMM
-		MSG_ReadPos (&net_message, pos);
-		//		/*
-//		if (modType("dday"))
-//		{
-//			CL_Explosion_Particle (pos, 250, true, true);
-//			CL_ExplosionParticles (pos, 5);
-//			CL_Radius_Explode_SP(pos, 5);
-//		}
-//		else
-//		{
-			CL_Explosion_Particle (pos, 100, true, true);
-			//CL_ExplosionParticles (pos, 2);
-			CL_ExplosionParticles (pos);
-//			CL_Radius_Explode_SP(pos, 2);
-//		}
-		S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
-		break;
-#endif
 	case TE_EXPLOSION1_NP:						// PMM
-#ifdef QMAX
-	  MSG_ReadPos (&net_message, pos); 
-	  CL_Explosion_Particle (pos, 50, true, true);
-	  CL_ExplosionParticles (pos);
-//	  CL_ExplosionParticles (pos, 0.6666666);
-//	  CL_Radius_Explode_SP(pos, 0.6666666);
-	  
-	  S_StartSound (pos, 0, 0, cl_sfx_grenexp, 1, ATTN_NORM, 0);
-	  break;
-#endif
 	case TE_EXPLOSION1:
 	case TE_ROCKET_EXPLOSION:
 	case TE_ROCKET_EXPLOSION_WATER:
 		MSG_ReadPos (&net_message, pos);
-#ifdef QMAX
-		CL_R_Explode_SP(pos);
-		//		CL_ExplosionParticles (pos, 1);	
-		CL_ExplosionParticles (pos);	
-#else
+
 		ex = CL_AllocExplosion ();
 		VectorCopy (pos, ex->ent.origin);
 		ex->type = ex_poly;
@@ -1038,7 +911,7 @@ void CL_ParseTEnt (void)
 		ex->frames = 15;
 		if ((type != TE_EXPLOSION1_BIG) && (type != TE_EXPLOSION1_NP))		// PMM
 			EXPLOSION_PARTICLES (pos);									// PMM
-#endif
+
 		if (type == TE_ROCKET_EXPLOSION_WATER)
 			S_StartSound (pos, 0, 0, cl_sfx_watrexp, 1, ATTN_NORM, 0);
 		else
@@ -1184,11 +1057,7 @@ void CL_ParseTEnt (void)
 
 
 	case TE_LIGHTNING:
-#ifdef QMAX
-	  ent = CL_ParseLightning (10);
-#else
-	  ent = CL_ParseLightning (cl_mod_lightning);
-#endif
+		ent = CL_ParseLightning (cl_mod_lightning);
 		S_StartSound (NULL, ent, CHAN_WEAPON, cl_sfx_lightning, 1, ATTN_NORM, 0);
 		break;
 
@@ -1330,154 +1199,6 @@ void CL_ParseTEnt (void)
 		MSG_ReadPos (&net_message, pos);
 		CL_WidowSplash (pos);
 		break;
-#if 0
-	//NEW CUSTOM TEMP EVENTS
-
-	case TE_LIGHTNINGFLARE: //-psychospaz
-		{
-			int num, entity;
-
-			entity = MSG_ReadShort (&net_message);
-			num = MSG_ReadShort (&net_message);
-			MSG_ReadPos (&net_message, pos);
-
-			//double up for opacity endurance
-			CL_LightningFlare(pos, entity, 2*num);
-			CL_LightningFlare(pos, entity, 2*num+1);
-		}
-		break;	
-	case TE_SMOKEPUFF: //hahaha server declared stains biotch - psychospaz
-		{
-			float size;
-
-			MSG_ReadPos (&net_message, pos);
-			MSG_ReadPos (&net_message, dir);
-			size = MSG_ReadFloat(&net_message);
-
-			CL_ParticleSmokeEffect (pos, dir, size);
-		}
-		break;
-	case TE_STAIN: //hahaha server declared stains biotch - psychospaz
-		{
-			float intens;
-			int i, color[3];
-
-			MSG_ReadPos (&net_message, pos);
-			intens = MSG_ReadFloat(&net_message);
-			for (i=0;i<3;i++)
-				color[i] = -MSG_ReadByte(&net_message);
-
-			re.AddStain(pos,	intens,
-								color[0],
-								color[1],
-								color[2]);
-		}
-		break;
-	case TE_FOOTPRINT:
-		{
-			float size;
-			vec3_t color, angle;
-
-			MSG_ReadPos (&net_message, pos);
-			MSG_ReadPos (&net_message, dir);
-			MSG_ReadPos (&net_message, color);
-			size = MSG_ReadFloat(&net_message);
-
-			angle[0] = anglemod(dir[0] + 180);
-			angle[1] = anglemod(dir[1]);
-			angle[2] = anglemod(dir[2]);
-
-			CL_ParticleFootPrint (pos, angle, size, color);
-		}
-		break;
-	case TE_FLAMEBURST:
-		{
-			float size;
-
-			MSG_ReadPos (&net_message, pos);
-			size = MSG_ReadFloat(&net_message);
-
-			CL_FlameBurst (pos, size);
-		}
-		break;
-	case TE_LASERSTUN:
-		{
-			int i;
-			float	size;
-			vec3_t	color;
-
-			MSG_ReadPos (&net_message, pos);
-			MSG_ReadPos (&net_message, dir);
-			size = MSG_ReadFloat(&net_message);
-			for (i=0;i<3;i++)
-				color[i] = (float)MSG_ReadByte(&net_message);
-
-			CL_LaserStun (pos, dir, color, size);
-		}
-		break;
-	case TE_STUNBLAST:
-		{
-			int i;
-			float	size;
-			vec3_t	color;
-
-			MSG_ReadPos (&net_message, pos);
-			size = MSG_ReadFloat(&net_message);
-			for (i=0;i<3;i++)
-				color[i] = (float)MSG_ReadByte(&net_message);
-
-			CL_StunBlast (pos, color, size);
-		}
-		break;
-	case TE_DISRUPTOR_EXPLOSION:
-		{
-			float	size;
-
-			MSG_ReadPos (&net_message, pos);
-			size = MSG_ReadFloat(&net_message);
-
-			CL_Disruptor_Explosion_Particle (pos, size);
-
-			S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
-		}
-		break;
-	case TE_DISINTEGRATE:
-		{
-			ent = MSG_ReadByte(&net_message);
-			MSG_ReadPos (&net_message, pos);
-			CL_Disintegrate (pos, ent);
-		}
-		break;
-	case TE_LENSFLARE:
-		{
-			float size, time;
-
-			MSG_ReadPos (&net_message, pos);
-			MSG_ReadPos (&net_message, dir);
-			size = MSG_ReadFloat (&net_message);
-			time = MSG_ReadFloat (&net_message);
-
-			CL_LensFlare(pos, dir, size, time);
-		}
-		break;	
-	case TE_WEATHERFX:
-		{
-			vec3_t color;
-			int   type;
-			float size, time;
-
-			MSG_ReadPos (&net_message, pos);
-			MSG_ReadPos (&net_message, dir);
-			MSG_ReadPos (&net_message, color);
-			type = MSG_ReadByte (&net_message);
-			size = MSG_ReadFloat (&net_message);
-			time = MSG_ReadFloat (&net_message);
-
-			CL_WeatherFx(pos, dir, color, type, size, time);
-		}
-		break;	
-
-#endif
 //PGM
 //==============
 

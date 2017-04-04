@@ -36,11 +36,7 @@ void DrawString (int x, int y, char *s)
 {
 	while (*s)
 	{
-#ifdef QMAX
-		re.DrawChar (x, y, *s, 1);
-#else
 		re.DrawChar (x, y, *s);
-#endif
 		x+=8;
 		s++;
 	}
@@ -50,11 +46,7 @@ void DrawAltString (int x, int y, char *s)
 {
 	while (*s)
 	{
-#ifdef QMAX
-		re.DrawChar (x, y, *s ^ 0x80, 1);
-#else
 		re.DrawChar (x, y, *s ^ 0x80);
-#endif
 		x+=8;
 		s++;
 	}
@@ -491,11 +483,7 @@ void Con_DrawInput (void)
 	y = con.vislines-16;
 
 	for (i=0 ; i<con.linewidth ; i++)
-#ifdef QMAX
-	  re.DrawChar ( (i+1)<<3, con.vislines - 22, text[i], 1);
-#else
-	re.DrawChar ( (i+1)<<3, con.vislines - 22, text[i]);
-#endif
+		re.DrawChar ( (i+1)<<3, con.vislines - 22, text[i]);
 
 // remove cursor
 	key_lines[edit_line][key_linepos] = 0;
@@ -532,16 +520,11 @@ void Con_DrawNotify (void)
 		text = con.text + (i % con.totallines)*con.linewidth;
 		
 		for (x = 0 ; x < con.linewidth ; x++)
-#ifdef QMAX
-		  re.DrawChar ( (x+1)<<3, v, text[x], 1);
-#else
 		  re.DrawChar ( (x+1)<<3, v, text[x]);
-#endif
 
 		v += 8;
 	}
-
-
+	
 	if (cls.key_dest == key_message)
 	{
 		if (chat_team)
@@ -561,18 +544,11 @@ void Con_DrawNotify (void)
 		x = 0;
 		while(s[x])
 		{
-#ifdef QMAX
-			re.DrawChar ( (x+skip)<<3, v, s[x], 1);
-#else
 			re.DrawChar ( (x+skip)<<3, v, s[x]);
-#endif
 			x++;
 		}
-#ifdef QMAX
-		re.DrawChar ( (x+skip)<<3, v, 10+((cls.realtime>>8)&1), 1);
-#else	
+
 		re.DrawChar ( (x+skip)<<3, v, 10+((cls.realtime>>8)&1));
-#endif
 		v += 8;
 	}
 	
@@ -608,21 +584,13 @@ void Con_DrawConsole (float frac)
 		lines = viddef.height;
 
 // draw the background
-#ifdef QMAX
-	re.DrawStretchPic (0, -viddef.height+lines, viddef.width, viddef.height, "conback", 1);
-#else
 	re.DrawStretchPic (0, -viddef.height+lines, viddef.width, viddef.height, "conback");
-#endif
 	SCR_AddDirtyPoint (0,0);
 	SCR_AddDirtyPoint (viddef.width-1,lines-1);
 
 	Com_sprintf (version, sizeof(version), "v%4.2f", VERSION);
 	for (x=0 ; x<5 ; x++)
-#ifdef QMAX
-		re.DrawChar (viddef.width-44+x*8, lines-12, 128+version[x],1);
-#else
 		re.DrawChar (viddef.width-44+x*8, lines-12, 128 + version[x] );
-#endif
 
 // draw the text
 	con.vislines = lines;
@@ -642,11 +610,7 @@ void Con_DrawConsole (float frac)
 	{
 	// draw arrows to show the buffer is backscrolled
 		for (x=0 ; x<con.linewidth ; x+=4)
-#ifdef QMAX
-			re.DrawChar ( (x+1)<<3, y, '^', 1);
-#else
 			re.DrawChar ( (x+1)<<3, y, '^');
-#endif			
 		y -= 8;
 		rows--;
 	}
@@ -662,11 +626,7 @@ void Con_DrawConsole (float frac)
 		text = con.text + (row % con.totallines)*con.linewidth;
 
 		for (x=0 ; x<con.linewidth ; x++)
-#ifdef QMAX
-			re.DrawChar ( (x+1)<<3, y, text[x], 1);
-#else
 			re.DrawChar ( (x+1)<<3, y, text[x]);
-#endif
 	}
 
 //ZOID
@@ -710,16 +670,10 @@ void Con_DrawConsole (float frac)
 		// draw it
 		y = con.vislines-12;
 		for (i = 0; i < strlen(dlbar); i++)
-#ifdef QMAX
-			re.DrawChar ( (i+1)<<3, y, dlbar[i], 1);
-#else
 			re.DrawChar ( (i+1)<<3, y, dlbar[i]);
-#endif
 	}
 //ZOID
 
 // draw the input prompt, user text, and cursor if desired
 	Con_DrawInput ();
 }
-
-

@@ -74,12 +74,6 @@ extern cvar_t *cl_drawfps; // FPS hack
 void SCR_TimeRefresh_f (void);
 void SCR_Loading_f (void);
 
-#ifdef QMAX
-char		crosshair_pic[MAX_QPATH];
-int			crosshair_width, crosshair_height;
-#endif
-
-
 /*
 ===============================================================================
 
@@ -284,11 +278,7 @@ void SCR_DrawCenterString (void)
 		SCR_AddDirtyPoint (x, y);
 		for (j=0 ; j<l ; j++, x+=8)
 		{
-#ifdef QMAX
-			re.DrawChar (x, y, start[j], 256);
-#else	
 			re.DrawChar (x, y, start[j]);	
-#endif
 			if (!remaining--)
 				return;
 		}
@@ -858,11 +848,7 @@ void DrawHUDString (char *string, int x, int y, int centerwidth, int xor)
 			x = margin;
 		for (i=0 ; i<width ; i++)
 		{
-#ifdef QMAX
-			re.DrawChar (x, y, line[i]^xor, 256);
-#else
 			re.DrawChar (x, y, line[i]^xor);
-#endif
 			x += 8;
 		}
 		if (*string)
@@ -935,18 +921,13 @@ void SCR_TouchPics (void)
 
 	if (crosshair->value)
 	{
-#ifdef QMAX
-	  if (crosshair->value > 9)
-	    crosshair->value = 9;
-#else
 	  if (crosshair->value > 3 || crosshair->value < 0)
 	    crosshair->value = 3;
-#endif	  
+
 	  Com_sprintf (crosshair_pic, sizeof(crosshair_pic), "ch%i", (int)(crosshair->value));
 	  re.DrawGetPicSize (&crosshair_width, &crosshair_height, crosshair_pic);
 	  if (!crosshair_width)
 	    crosshair_pic[0] = 0;
-	
 	}
 }
 

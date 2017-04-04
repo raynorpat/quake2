@@ -44,11 +44,8 @@ void Inv_DrawString (int x, int y, char *string)
 {
 	while (*string)
 	{
-#ifdef QMAX
-	  re.DrawChar (x, y, *string, 256);
-#else
-	  re.DrawChar (x, y, *string);
-#endif
+		re.DrawChar (x, y, *string);
+
 		x+=8;
 		string++;
 	}
@@ -134,11 +131,7 @@ void CL_DrawInventory (void)
 		else	// draw a blinky cursor by the selected item
 		{
 			if ( (int)(cls.realtime*10) & 1)
-#ifdef QMAX
-				re.DrawChar (x-8, y, 15, 256);
-#else
 				re.DrawChar (x-8, y, 15);
-#endif
 		}
 		Inv_DrawString (x, y, string);
 		y += 8;

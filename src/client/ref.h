@@ -74,20 +74,12 @@ typedef struct entity_s
 
 	struct image_s	*skin;			// NULL for inline skin
 	int		flags;
-#ifdef QMAX
-        int		renderfx;
-#endif
 } entity_t;
 
 #define ENTITY_FLAGS  68
 
 typedef struct
-{
-#ifdef QMAX
-  qboolean spotlight;
-  vec3_t   direction;
-#endif
-  
+{  
   vec3_t	origin;
   vec3_t	color;
   float	intensity;
@@ -98,17 +90,6 @@ typedef struct
 	vec3_t	origin;
 	int		color;
 	float	alpha;
-#ifdef QMAX
-  vec3_t	angle;
-  float	size;
-  int		flags;
-  
-  float	red;
-  float	green;
-  float	blue;
-  
-  int		image;
-#endif
 } particle_t;
 
 typedef struct
@@ -181,17 +162,8 @@ typedef struct
 
 	void	(*RenderFrame) (refdef_t *fd);
 
-#ifdef QMAX
-  void	(*AddStain) (vec3_t org, float intensity, float r, float g, float b);
-  void	(*SetParticlePicture) (int num, char *name);
-  void	(*DrawScaledPic) (int x, int y, float scale, float alpha, char *name);
-  float	(*CharMap_Scale) (void);
-  void	(*DrawStretchPic) (int x, int y, int w, int h, char *name, float alpha);
-  void	(*DrawChar) (int x, int y, int c, int alpha);
-#else
-  void	(*DrawStretchPic) (int x, int y, int w, int h, char *name);
-  void	(*DrawChar) (int x, int y, int c);
-#endif
+	void	(*DrawStretchPic) (int x, int y, int w, int h, char *name);
+	void	(*DrawChar) (int x, int y, int c);
 	void	(*DrawGetPicSize) (int *w, int *h, char *name);	// will return 0 0 if not found
 	void	(*DrawPic) (int x, int y, char *name);
 	void	(*DrawTileClear) (int x, int y, int w, int h, char *name);
@@ -209,7 +181,6 @@ typedef struct
 	void	(*EndFrame) (void);
 
 	void	(*AppActivate)( qboolean activate );
-
 } refexport_t;
 
 //
@@ -246,27 +217,7 @@ typedef struct
 	qboolean	(*Vid_GetModeInfo)( int *width, int *height, int mode );
 	void		(*Vid_MenuInit)( void );
 	void		(*Vid_NewWindow)( int width, int height );
-
-#ifdef QMAX
-  void	(*SetParticlePics) (void);
-#endif
 } refimport_t;
-
-#ifdef QMAX
-#define DIV254BY255 (0.9960784313725490196078431372549f)
-#define DIV255 (0.003921568627450980392156862745098f)
-#define DIV256 (0.00390625f)
-#define DIV512 (0.001953125f)
-#define TWOTHIRDS (0.666666666666666666666666666666666666666f)
-
-typedef struct
-{
-	vec3_t	origin;
-	vec3_t	color;
-	float	intensity;
-} dstain_t;
-#endif
-
 
 // this is the only function actually exported at the linker level
 typedef	refexport_t	(*GetRefAPI_t) (refimport_t);

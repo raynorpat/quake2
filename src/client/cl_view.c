@@ -54,24 +54,6 @@ lightstyle_t	r_lightstyles[MAX_LIGHTSTYLES];
 char cl_weaponmodels[MAX_CLIENTWEAPONMODELS][MAX_QPATH];
 int num_cl_weaponmodels;
 
-#ifdef QMAX
-/*
-====================
-CL_Trace
-
-====================
-*/
-
-trace_t CL_Trace (vec3_t start, vec3_t end, float size,  int contentmask)
-{
-	vec3_t maxs, mins;
-
-	VectorSet(maxs, size, size, size);
-	VectorSet(mins, -size, -size, -size);
-
-	return CM_BoxTrace (start, end, mins, maxs, 0, contentmask);
-}
-#endif
 
 /*
 ====================
@@ -108,34 +90,6 @@ V_AddParticle
 
 =====================
 */
-#ifdef QMAX
-void V_AddParticle (vec3_t org, vec3_t angle, vec3_t color, float alpha, float size, int image, int flags)
-{
-	int i;
-	particle_t	*p;
-
-	if (r_numparticles >= MAX_PARTICLES)
-		return;
-	p = &r_particles[r_numparticles++];
-
-	for (i=0;i<3;i++)
-	{
-		p->origin[i] = org[i];
-		p->angle[i] = angle[i];
-	}
-	p->red = color[0];
-	p->green = color[1];
-	p->blue = color[2];
-	p->alpha = alpha;
-	p->image = image;
-	p->flags = flags;
-	p->size  = size;
-
-	
-
-	
-}
-#else
 void V_AddParticle (vec3_t org, int color, float alpha)
 {
 	particle_t	*p;
@@ -147,7 +101,8 @@ void V_AddParticle (vec3_t org, int color, float alpha)
 	p->color = color;
 	p->alpha = alpha;
 }
-#endif
+
+
 /*
 =====================
 V_AddLight
@@ -470,9 +425,6 @@ SCR_DrawCrosshair
 */
 void SCR_DrawCrosshair (void)
 {
-#ifdef QMAX
-  float scale;
-#endif
 	if (!crosshair->value)
 		return;
 
@@ -494,17 +446,8 @@ void SCR_DrawCrosshair (void)
 	if (!crosshair_pic[0])
 		return;
 
-#ifdef QMAX
-	scale = crosshair_scale->value * (viddef.width/640);
-	re.DrawScaledPic (scr_vrect.x + ((scr_vrect.width - crosshair_width)>>1) //width
-			    , scr_vrect.y + ((scr_vrect.height - crosshair_height)>>1)	//height
-			  , scale	//scale
-			  , 0.75 + 0.25*sin(anglemod(cl.time*0.005))	//alpha
-			  , crosshair_pic); //pic
-#else
 	re.DrawPic (scr_vrect.x + ((scr_vrect.width - crosshair_width)>>1)
 		    , scr_vrect.y + ((scr_vrect.height - crosshair_height)>>1), crosshair_pic);
-#endif
 }
 
 /*

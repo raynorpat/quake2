@@ -33,17 +33,9 @@ void (APIENTRY * qglColorTableEXT)(GLenum, GLenum, GLsizei, GLenum, GLenum, cons
 void (APIENTRY * qglLockArraysEXT) (int, int);
 void (APIENTRY * qglUnlockArraysEXT) (void);
 
-void (APIENTRY * qglMTexCoord2fSGIS)(GLenum, GLfloat, GLfloat);
-void (APIENTRY * qglSelectTextureSGIS)(GLenum);
-
-void (APIENTRY * qglActiveTextureARB)(GLenum);
-void (APIENTRY * qglClientActiveTextureARB)(GLenum);
-
 #ifdef _WIN32
 BOOL (WINAPI * qwglSwapIntervalEXT)(int interval);
 #endif
-
-int QGL_TEXTURE0, QGL_TEXTURE1;
 
 model_t		*r_worldmodel;
 
@@ -113,7 +105,6 @@ cvar_t	*gl_particle_att_c;
 
 cvar_t	*gl_ext_swapinterval;
 cvar_t	*gl_ext_palettedtexture;
-cvar_t	*gl_ext_multitexture;
 cvar_t	*gl_ext_pointparameters;
 cvar_t	*gl_ext_compiled_vertex_array;
 
@@ -1051,7 +1042,6 @@ void R_Register( void )
 
 	gl_ext_swapinterval = ri.Cvar_Get( "gl_ext_swapinterval", "1", CVAR_ARCHIVE );
 	gl_ext_palettedtexture = ri.Cvar_Get( "gl_ext_palettedtexture", "1", CVAR_ARCHIVE );
-	gl_ext_multitexture = ri.Cvar_Get( "gl_ext_multitexture", "1", CVAR_ARCHIVE );
 	gl_ext_pointparameters = ri.Cvar_Get( "gl_ext_pointparameters", "1", CVAR_ARCHIVE );
 	gl_ext_compiled_vertex_array = ri.Cvar_Get( "gl_ext_compiled_vertex_array", "1", CVAR_ARCHIVE );
 
@@ -1351,51 +1341,6 @@ int R_Init( void *hinstance, void *hWnd )
 	else
 	{
 		ri.Con_Printf( PRINT_ALL, "...GL_EXT_shared_texture_palette not found\n" );
-	}
-
-	if ( strstr( gl_config.extensions_string, "GL_ARB_multitexture" ) )
-	{
-		if ( gl_ext_multitexture->value )
-		{
-			ri.Con_Printf( PRINT_ALL, "...using GL_ARB_multitexture\n" );
-			qglMTexCoord2fSGIS = ( void(__stdcall *)(GLenum, GLfloat, GLfloat) ) qwglGetProcAddress( "glMultiTexCoord2fARB" );
-			qglActiveTextureARB = ( void(__stdcall *)(GLenum) ) qwglGetProcAddress( "glActiveTextureARB" );
-			qglClientActiveTextureARB = ( void(__stdcall *)(GLenum) ) qwglGetProcAddress( "glClientActiveTextureARB" );
-			QGL_TEXTURE0 = GL_TEXTURE0_ARB;
-			QGL_TEXTURE1 = GL_TEXTURE1_ARB;
-		}
-		else
-		{
-			ri.Con_Printf( PRINT_ALL, "...ignoring GL_ARB_multitexture\n" );
-		}
-	}
-	else
-	{
-		ri.Con_Printf( PRINT_ALL, "...GL_ARB_multitexture not found\n" );
-	}
-
-	if ( strstr( gl_config.extensions_string, "GL_SGIS_multitexture" ) )
-	{
-		if ( qglActiveTextureARB )
-		{
-			ri.Con_Printf( PRINT_ALL, "...GL_SGIS_multitexture deprecated in favor of ARB_multitexture\n" );
-		}
-		else if ( gl_ext_multitexture->value )
-		{
-			ri.Con_Printf( PRINT_ALL, "...using GL_SGIS_multitexture\n" );
-			qglMTexCoord2fSGIS = ( void(__stdcall *)(GLenum, GLfloat, GLfloat) ) qwglGetProcAddress( "glMTexCoord2fSGIS" );
-			qglSelectTextureSGIS = ( void(__stdcall *)(GLenum) ) qwglGetProcAddress( "glSelectTextureSGIS" );
-			QGL_TEXTURE0 = GL_TEXTURE0_SGIS;
-			QGL_TEXTURE1 = GL_TEXTURE1_SGIS;
-		}
-		else
-		{
-			ri.Con_Printf( PRINT_ALL, "...ignoring GL_SGIS_multitexture\n" );
-		}
-	}
-	else
-	{
-		ri.Con_Printf( PRINT_ALL, "...GL_SGIS_multitexture not found\n" );
 	}
 
 	GL_SetDefaultState();

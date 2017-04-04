@@ -67,61 +67,6 @@ void GL_SetTexturePalette( unsigned palette[256] )
 	}
 }
 
-void GL_EnableMultitexture( qboolean enable )
-{
-	if ( !qglSelectTextureSGIS && !qglActiveTextureARB )
-		return;
-
-	if ( enable )
-	{
-		GL_SelectTexture( QGL_TEXTURE1 );
-		qglEnable( GL_TEXTURE_2D );
-		GL_TexEnv( GL_REPLACE );
-	}
-	else
-	{
-		GL_SelectTexture( QGL_TEXTURE1 );
-		qglDisable( GL_TEXTURE_2D );
-		GL_TexEnv( GL_REPLACE );
-	}
-	GL_SelectTexture( QGL_TEXTURE0 );
-	GL_TexEnv( GL_REPLACE );
-}
-
-void GL_SelectTexture( GLenum texture )
-{
-	int tmu;
-
-	if ( !qglSelectTextureSGIS && !qglActiveTextureARB )
-		return;
-
-	if ( texture == QGL_TEXTURE0 )
-	{
-		tmu = 0;
-	}
-	else
-	{
-		tmu = 1;
-	}
-
-	if ( tmu == gl_state.currenttmu )
-	{
-		return;
-	}
-
-	gl_state.currenttmu = tmu;
-
-	if ( qglSelectTextureSGIS )
-	{
-		qglSelectTextureSGIS( texture );
-	}
-	else if ( qglActiveTextureARB )
-	{
-		qglActiveTextureARB( texture );
-		qglClientActiveTextureARB( texture );
-	}
-}
-
 void GL_TexEnv( GLenum mode )
 {
 	static int lastmodes[2] = { -1, -1 };
@@ -143,22 +88,6 @@ void GL_Bind (int texnum)
 		return;
 	gl_state.currenttextures[gl_state.currenttmu] = texnum;
 	qglBindTexture (GL_TEXTURE_2D, texnum);
-}
-
-void GL_MBind( GLenum target, int texnum )
-{
-	GL_SelectTexture( target );
-	if ( target == QGL_TEXTURE0 )
-	{
-		if ( gl_state.currenttextures[0] == texnum )
-			return;
-	}
-	else
-	{
-		if ( gl_state.currenttextures[1] == texnum )
-			return;
-	}
-	GL_Bind( texnum );
 }
 
 typedef struct

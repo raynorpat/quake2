@@ -380,12 +380,6 @@ extern	void ( APIENTRY * qglColorTableEXT)( GLenum, GLenum, GLsizei, GLenum, GLe
 extern	void ( APIENTRY * qglLockArraysEXT) (int , int);
 extern	void ( APIENTRY * qglUnlockArraysEXT) (void);
 
-extern	void ( APIENTRY * qglMTexCoord2fSGIS)( GLenum, GLfloat, GLfloat );
-extern	void ( APIENTRY * qglSelectTextureSGIS)( GLenum );
-
-extern	void ( APIENTRY * qglActiveTextureARB)( GLenum );
-extern	void ( APIENTRY * qglClientActiveTextureARB)( GLenum );
-
 extern BOOL ( WINAPI * qwglSwapIntervalEXT)( int interval );
 
 #ifdef _WIN32
@@ -412,8 +406,6 @@ void Fake_glColorTableEXT( GLenum target, GLenum internalformat,
 /* deprecated */
 #define GL_TEXTURE0_SGIS					0x835E
 #define GL_TEXTURE1_SGIS					0x835F
-
-extern int QGL_TEXTURE0, QGL_TEXTURE1; /* ARB/SGIS texture defs */
 
 /*
 ** extension constants

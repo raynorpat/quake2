@@ -1,0 +1,10 @@
+*.dll
+baseq2/
+*.obj
+*.tlog
+*.log
+*.user
+*.filters
+*.pdb
+*.db
+*.idb

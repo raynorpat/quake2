@@ -325,9 +325,6 @@ extern	cvar_t	*cl_timedemo;
 
 extern	cvar_t	*cl_vwep;
 
-// HUDclock QuDos
-extern	cvar_t	*cl_drawclock;
-extern  cvar_t  *cl_timeformat;
 typedef struct
 {
 	int		key;				// so entities can reuse same entry

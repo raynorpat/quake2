@@ -128,9 +128,6 @@ typedef enum
 
 #include "gl_model.h"
 
-void GL_BeginRendering (int *x, int *y, int *width, int *height);
-void GL_EndRendering (void);
-
 void GL_SetDefaultState( void );
 void GL_UpdateSwapInterval( void );
 
@@ -245,7 +242,7 @@ extern  cvar_t  *gl_lockpvs;
 extern	cvar_t	*vid_fullscreen;
 extern	cvar_t	*vid_gamma;
 
-extern	cvar_t		*intensity;
+extern	cvar_t	*intensity;
 
 
 extern	int		gl_lightmap_format;
@@ -259,7 +256,6 @@ extern	int		c_visible_textures;
 
 extern	float	r_world_matrix[16];
 
-void R_TranslatePlayerSkin (int playernum);
 void GL_Bind (int texnum);
 void GL_MBind( GLenum target, int texnum );
 void GL_TexEnv( GLenum value );
@@ -276,9 +272,6 @@ extern	model_t	*r_worldmodel;
 extern	unsigned	d_8to24table[256];
 
 extern	int		registration_sequence;
-
-
-void V_AddBlend (float r, float g, float b, float a, float *v_blend);
 
 int 	R_Init( void *hinstance, void *hWnd );
 void	R_Shutdown( void );
@@ -329,7 +322,6 @@ void	Draw_FadeScreen (void);
 void	Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte *data);
 
 void	R_BeginFrame( float camera_separation );
-void	R_SwapBuffers( int );
 void	R_SetPalette ( const unsigned char *palette);
 
 int		Draw_GetPalette (void);
